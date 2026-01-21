@@ -1,52 +1,33 @@
-# Maintainer: Your Name <your.email@example.com>
-pkgname=hel-usb-writer
-pkgver=0.1 # تم التغيير إلى 0.1 لأنه لا يوجد إصدار v1.0.0 على GitHub، هذا للاصدارات التجريبية
+# Maintainer: Helwan Linux Team
+pkgname=helwan-usb-writer
+pkgver=1.0.0
 pkgrel=1
-pkgdesc="A simple tool to write ISO images to USB drives with checksum verification."
+pkgdesc="Professional ISO to USB writer tool for Helwan Linux"
 arch=('x86_64')
-url="https://github.com/helwan-linux/$pkgname" # رابط مشروعك على GitHub
-license=('MIT') # يرجى التأكد من أنك تستخدم ترخيص MIT أو قم بتغييره حسب ترخيص مشروعك
+url="https://github.com/helwan-linux1/usb-writer"
+license=('GPL3')
+depends=('gtk4' 'libadwaita' 'util-linux' 'polkit' 'coreutils')
+makedepends=('nim' 'nimble')
+source=("git+$url.git")
+sha256sums=('SKIP')
 
-# التبعيات (البرامج الأخرى التي يحتاجها تطبيقك للعمل)
-depends=('python' 'python-pyqt5' 'coreutils' 'util-linux' 'polkit')
-
-# المصدر: رابط ملف tarball للفرع الرئيسي (main) من GitHub
-# هذا الرابط هو الذي يعمل دائمًا لمحتويات الفرع الرئيسي
-source=("https://github.com/helwan-linux/$pkgname/archive/main.tar.gz")
-sha256sums=('SKIP') # استخدم 'SKIP' إذا كنت لا ترغب في التحقق من التجزئة، أو قم بتوليدها لاحقاً
-
-# دالة build(): لا تحتاج عادةً لشيء لسكربتات بايثون البسيطة
 build() {
-  return 0
+  cd "usb-writer"
+  # تثبيت المكتبة المطلوبة للتجميع
+  nimble install --extratree:off --accept owlkettle 
+  # تجميع البرنامج كملف تنفيذي Release
+  nim c -d:release --out:helwan_usb_writer src/helwan_usb_writer.nim 
 }
 
-# دالة package(): تقوم بتثبيت الملفات إلى هيكل الدليل الوهمي (pkgdir)
 package() {
-  # إنشاء مجلدات الوجهة المطلوبة
-  install -d "$pkgdir/usr/bin/"
-  install -d "$pkgdir/usr/share/pixmaps/"
-  install -d "$pkgdir/usr/share/applications/"
-
-  # تثبيت سكربت البايثون وجعله قابلاً للتنفيذ
-  # المسار الصحيح: $srcdir/hel-usb-writer-main/HelwanUSBWriter/helwan_usb_writer.py
-  # (حيث 'hel-usb-writer-main' هو المجلد الذي يتم فك ضغط المصدر فيه من GitHub's main branch tarball)
-  install -m 755 "$srcdir/$pkgname-main/HelwanUSBWriter/helwan_usb_writer.py" "$pkgdir/usr/bin/helwan_usb_writer.py"
-
-  # تثبيت الأيقونة
-  # المسار الصحيح: $srcdir/hel-usb-writer-main/HelwanUSBWriter/helwan-usb.png
-  install -m 644 "$srcdir/$pkgname-main/HelwanUSBWriter/helwan-usb.png" "$pkgdir/usr/share/pixmaps/helwan-usb.png"
-
-  # إنشاء ملف .desktop مباشرة داخل دالة package()
-  cat > "$pkgdir/usr/share/applications/helwan_usb_iso_writer.desktop" << EOF
-[Desktop Entry]
-Name=Helwan USB ISO Writer
-Comment=A simple tool to write ISO images to USB drives
-Exec=sh -c "python3 /usr/bin/helwan_usb_writer.py"
-Icon=/usr/share/pixmaps/helwan-usb.png
-Terminal=false
-Type=Application
-Categories=System;Utility;
-Keywords=usb;iso;writer;bootable;checksum;
-StartupNotify=true
-EOF
+  cd "usb-writer"
+  
+  # 1. تثبيت الملف التنفيذي
+  install -Dm755 helwan_usb_writer "${pkgdir}/usr/bin/helwan_usb_writer"
+  
+  # 2. تثبيت ملف الديسك توب (من المجلد الرئيسي حسب مخططك)
+  install -Dm644 helwan_usb_iso_writer.desktop "${pkgdir}/usr/share/applications/helwan-usb-writer.desktop"
+  
+  # 3. تثبيت الأيقونة (من مجلد assets إلى مسار الأيقونات الرسمي)
+  install -Dm644 assets/helwan-usb.png "${pkgdir}/usr/share/pixmaps/helwan-usb.png" 
 }
