@@ -14,15 +14,24 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build Program
+      - name: Debug and Build
         run: |
-          # 1. تثبيت المكتبة
+          # تثبيت المكتبة
           nimble install --accept owlkettle
           
-          # 2. تحديد مكان الملف وتجميعه في مكانه الأصلي
-          # هذا الأمر سيجد الملف أينما كان ويقوم بتجميعه داخل المجلد الخاص به
-          TARGET_FILE=$(find . -name "helwan_usb_writer.nim")
-          nim c -d:release "$TARGET_FILE"
+          # عرض هيكل الملفات عشان نعرف الـ src فين بالظبط
+          ls -R
+          
+          # البحث عن الملف وتجميعه يدوياً بذكاء
+          FILE=$(find . -name "helwan_usb_writer.nim" | head -n 1)
+          if [ -z "$FILE" ]; then
+            echo "Error: Could not find helwan_usb_writer.nim"
+            exit 1
+          fi
+          
+          # الدخول لمجلد الملف والتجميع
+          cd $(dirname "$FILE")/..
+          nim c -d:release --out:hel-usb-writer src/helwan_usb_writer.nim
 
       - name: Check Result
-        run: find . -name "helwan_usb_writer" -type f
+        run: find . -name "hel-usb-writer" -type f
