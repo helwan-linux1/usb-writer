@@ -2,39 +2,24 @@ name: Build Checker
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
 
 jobs:
   build-check:
     runs-on: ubuntu-latest
     container: archlinux:latest
     steps:
-      - name: Install System Dependencies
+      - name: Install Dependencies
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm git nim nimble gtk4 libadwaita base-devel
+          pacman -S --noconfirm git nim nimble gtk4 libadwaita gobject-introspection base-devel
 
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Build Program
         run: |
-          # تثبيت المكتبة
-          nimble install --accept owlkettle
-          
-          # الدخول للمجلد الصحيح
+          # تثبيت gintro (بياخد وقت شوية في أول مرة لأنه بيولد الروابط)
+          nimble install --accept gintro
           cd HelwanUSBWriter
-          
-          # التجميع
+          # التجميع باستخدام gintro
           nim c -d:release --out:../hel-usb-writer src/helwan_usb_writer.nim
-
-      - name: Verify Output
-        run: |
-          if [ -f "hel-usb-writer" ]; then
-            echo "Success: Executable generated!"
-            ls -lh hel-usb-writer
-          else
-            echo "Error: Build failed!"
-            exit 1
-          fi
