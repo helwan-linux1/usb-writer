@@ -14,24 +14,23 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Debug and Build
+      - name: Build Program
         run: |
-          # تثبيت المكتبة
+          # 1. تثبيت مكتبة owlkettle
           nimble install --accept owlkettle
           
-          # عرض هيكل الملفات عشان نعرف الـ src فين بالظبط
-          ls -R
+          # 2. الدخول للمجلد الذي رأيناه في ls -R
+          cd HelwanUSBWriter
           
-          # البحث عن الملف وتجميعه يدوياً بذكاء
-          FILE=$(find . -name "helwan_usb_writer.nim" | head -n 1)
-          if [ -z "$FILE" ]; then
-            echo "Error: Could not find helwan_usb_writer.nim"
+          # 3. التجميع (استخدام الملف الذي غيرنا امتداده لـ .nim)
+          nim c -d:release --out:../hel-usb-writer src/helwan_usb_writer.nim
+
+      - name: Verify Output
+        run: |
+          if [ -f "hel-usb-writer" ]; then
+            echo "Success: Executable generated!"
+            ls -lh hel-usb-writer
+          else
+            echo "Error: Build failed!"
             exit 1
           fi
-          
-          # الدخول لمجلد الملف والتجميع
-          cd $(dirname "$FILE")/..
-          nim c -d:release --out:hel-usb-writer src/helwan_usb_writer.nim
-
-      - name: Check Result
-        run: find . -name "hel-usb-writer" -type f
