@@ -1,14 +1,16 @@
 import owlkettle, osproc, os, strutils, translations, tables
 
-# تعريف الحالة كـ Viewable بدون قيم افتراضية داخل الماكرو
-# هذا يضمن أن الماكرو سينشئ الحقول (Fields) بشكل صحيح
-viewable AppState:
-  currentLangStr: string
-  isoPath: string
-  logContent: string
-  selectedDevice: string
+# تعريف النوع يدوياً قبل الماكرو عشان المترجم ميهنجش
+type
+  AppState* = ref object
+    currentLangStr*: string
+    isoPath*: string
+    logContent*: string
+    selectedDevice*: string
 
-# دالة الترجمة
+# الماكرو الآن مهمته الربط فقط وليس إنشاء الحقول من الصفر
+viewable AppState
+
 proc t(state: AppState, key: string): string =
   let lang = if state.currentLangStr == "ar": ar else: en
   result = LangData[lang][key]
@@ -76,7 +78,7 @@ method view(view: AppView): Widget =
 adorn_flow(AppView, AppState)
 
 when isMainModule:
-  # نقوم بتهيئة القيم هنا يدوياً لضمان حقنها في الـ State
+  # تهيئة الحالة يدوياً
   let initial = AppState(
     currentLangStr: "en",
     isoPath: "No ISO Selected",
