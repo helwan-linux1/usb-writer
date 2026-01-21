@@ -1,0 +1,35 @@
+name: Build Helwan USB Writer
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Install System Dependencies
+        run: |
+          pacman -Syu --noconfirm
+          # wget ضروري جداً لنجاح تثبيت gintro
+          pacman -S --noconfirm git nim nimble gtk4 libadwaita gobject-introspection base-devel wget
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Nim Library
+        run: |
+          # نثبت gintro أولاً وبشكل منفصل
+          nimble install --accept gintro
+
+      - name: Build Helwan USB Writer
+        run: |
+          cd HelwanUSBWriter
+          # التجميع مع تفعيل التحسينات (Release)
+          nim c -d:release --out:../hel-usb-writer src/helwan_usb_writer.nim
+
+      - name: Upload Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: helwan-usb-writer-binary
+          path: hel-usb-writer
