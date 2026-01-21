@@ -1,0 +1,4 @@
+sudo pacman -S gtk4 libadwaita util-linux polkit coreutils
+
+nimble install owlkettle
+

@@ -1,0 +1,8 @@
+HelwanUSBWriter/
+├── helwan_usb_iso_writer.desktop
+├── src/
+│   ├── helwan_usb_writer.nim
+│   └── translations.nim
+├── assets/
+│   └── helwan-usb.png
+└── helwan_usb.nimble
