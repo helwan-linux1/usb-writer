@@ -1,18 +1,18 @@
-import owlkettle, osproc, os, strutils, translations
+import owlkettle, osproc, os, strutils, translations, tables
 
-# الحل الوحيد والمضمون هو تعريف الـ State بمتغيرات أساسية 
-# الماكرو أحياناً بيفشل في قراءة الـ Enums الخارجية كـ Default values
 viewable AppState:
-  currentLang: Language
-  isoPath: string
-  logContent: string
-  selectedDevice: string
+  # تحديد النوع صراحة كـ translations.Language لحل مشكلة الماكرو
+  currentLang: translations.Language = translations.en
+  isoPath: string = "No ISO Selected"
+  logContent: string = ""
+  selectedDevice: string = ""
 
+# تعديل proc t ليتوافق مع هيكل الجداول في translations.nim
 proc t(state: AppState, key: string): string =
-  result = LangData[state.currentLang][key]
+  # الوصول للجدول المتداخل [Language][string]
+  return translations.LangData[state.currentLang][key]
 
 method view(view: AppView): Widget =
-  # استخدام s للوصول للـ state بشكل مباشر ومعرف للمترجم
   let s = view.state
   result = gui:
     Window:
@@ -25,11 +25,11 @@ method view(view: AppView): Widget =
         Box(orient = OrientHorizontal, spacing = 5):
           Button(text = "English"):
             proc clicked() = 
-              view.state.currentLang = en
+              view.state.currentLang = translations.en
               view.app.redraw()
           Button(text = "العربية"):
             proc clicked() = 
-              view.state.currentLang = ar
+              view.state.currentLang = translations.ar
               view.app.redraw()
 
         Label(text = s.isoPath)
@@ -75,11 +75,8 @@ method view(view: AppView): Widget =
 adorn_flow(AppView, AppState)
 
 when isMainModule:
-  # تهيئة الـ State بشكل يدوي عند التشغيل لضمان تعريف الحقول
-  let initialState = AppState(
-    currentLang: en,
+  owlkettle.brew(gui(AppView(state = AppState(
+    currentLang: translations.en,
     isoPath: "No ISO Selected",
-    logContent: LangData[en]["status_ready"],
-    selectedDevice: ""
-  )
-  owlkettle.brew(gui(AppView(state = initialState)))
+    logContent: translations.LangData[translations.en]["status_ready"]
+  ))))
