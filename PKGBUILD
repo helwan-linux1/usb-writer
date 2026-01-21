@@ -1,5 +1,5 @@
 # Maintainer: Helwan Linux Team
-pkgname=helwan-usb-writer
+pkgname=hel-usb-writer
 pkgver=1.0.0
 pkgrel=1
 pkgdesc="Professional ISO to USB writer tool for Helwan Linux"
@@ -7,27 +7,27 @@ arch=('x86_64')
 url="https://github.com/helwan-linux1/usb-writer"
 license=('GPL3')
 depends=('gtk4' 'libadwaita' 'util-linux' 'polkit' 'coreutils')
-makedepends=('nim' 'nimble')
-source=("git+$url.git")
+makedepends=('git' 'nim' 'nimble')
+source=("git+https://github.com/helwan-linux1/usb-writer.git")
 sha256sums=('SKIP')
 
 build() {
   cd "usb-writer"
-  # تثبيت المكتبة المطلوبة للتجميع
-  nimble install --extratree:off --accept owlkettle 
-  # تجميع البرنامج كملف تنفيذي Release
-  nim c -d:release --out:helwan_usb_writer src/helwan_usb_writer.nim 
+  # [cite_start]تثبيت مكتبة owlkettle المطلوبة للبناء [cite: 1]
+  nimble install --extratree:off --accept owlkettle
+  # تجميع الكود لإنتاج ملف تنفيذي باسم hel-usb-writer
+  nim c -d:release --out:hel-usb-writer src/helwan_usb_writer.nim
 }
 
 package() {
   cd "usb-writer"
   
-  # 1. تثبيت الملف التنفيذي
-  install -Dm755 helwan_usb_writer "${pkgdir}/usr/bin/helwan_usb_writer"
+  # تثبيت الملف التنفيذي
+  install -Dm755 hel-usb-writer "${pkgdir}/usr/bin/hel-usb-writer"
   
-  # 2. تثبيت ملف الديسك توب (من المجلد الرئيسي حسب مخططك)
-  install -Dm644 helwan_usb_iso_writer.desktop "${pkgdir}/usr/share/applications/helwan-usb-writer.desktop"
+  # تثبيت ملف الديسك توب لظهور البرنامج في القائمة
+  install -Dm644 helwan_usb_iso_writer.desktop "${pkgdir}/usr/share/applications/hel-usb-writer.desktop"
   
-  # 3. تثبيت الأيقونة (من مجلد assets إلى مسار الأيقونات الرسمي)
-  install -Dm644 assets/helwan-usb.png "${pkgdir}/usr/share/pixmaps/helwan-usb.png" 
+  # [cite_start]تثبيت الأيقونة في المسار المحدد في الكود [cite: 2]
+  install -Dm644 assets/helwan-usb.png "${pkgdir}/usr/share/pixmaps/helwan-usb.png"
 }
