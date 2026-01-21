@@ -16,8 +16,17 @@ jobs:
 
       - name: Build Program
         run: |
+          # التأكد من تحميل المكتبات
           nimble install --accept owlkettle
+          
+          # تأكد من المسار: إذا كان الكود داخل مجلد فرعي، استخدم cd
+          # سنستخدم البحث التلقائي عن المجلد لو وجد
+          [ -d "src" ] || cd $(find . -maxdepth 2 -type d -name "src" -exec dirname {} \;)
+          
+          # التجميع الآن من داخل المجلد الذي يحتوي على src
           nim c -d:release --out:hel-usb-writer src/helwan_usb_writer.nim
 
       - name: Check Executable
-        run: ls -l hel-usb-writer
+        run: |
+          # التأكد من وجود الملف الناتج
+          find . -name "hel-usb-writer" -type f
