@@ -3,7 +3,8 @@ Name=Helwan USB Writer
 Name[ar]=حارق حلوان
 Comment=A professional tool to write ISO images to USB
 Comment[ar]=أداة احترافية لحرق صور الآيزو على الفلاشة
-Exec=hel-usb-writer
+# نضع pkexec هنا لكي يطلب الباسورد بمجرد تشغيل الواجهة
+Exec=pkexec hel-usb-writer
 Icon=helwan-usb
 Terminal=false
 Type=Application
