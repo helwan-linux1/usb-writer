@@ -1,16 +1,20 @@
 import owlkettle, osproc, os, strutils, translations, tables
 
+# نقل التعريف هنا عشان الماكرو يشوفه وما يطلعش undeclared field
+type LocalLanguage = enum en, ar
+
 viewable AppState:
-  # تحديد النوع صراحة كـ translations.Language لحل مشكلة الماكرو
-  currentLang: translations.Language = translations.en
+  currentLang: LocalLanguage = en
   isoPath: string = "No ISO Selected"
   logContent: string = ""
   selectedDevice: string = ""
 
-# تعديل proc t ليتوافق مع هيكل الجداول في translations.nim
 proc t(state: AppState, key: string): string =
-  # الوصول للجدول المتداخل [Language][string]
-  return translations.LangData[state.currentLang][key]
+  # تحويل النوع المحلي لنوع ملف الترجمة عشان الجدول يفتح
+  let lang = case state.currentLang:
+    of en: translations.en
+    of ar: translations.ar
+  result = translations.LangData[lang][key] [cite: 1, 2, 3]
 
 method view(view: AppView): Widget =
   let s = view.state
@@ -25,11 +29,11 @@ method view(view: AppView): Widget =
         Box(orient = OrientHorizontal, spacing = 5):
           Button(text = "English"):
             proc clicked() = 
-              view.state.currentLang = translations.en
+              view.state.currentLang = en
               view.app.redraw()
           Button(text = "العربية"):
             proc clicked() = 
-              view.state.currentLang = translations.ar
+              view.state.currentLang = ar
               view.app.redraw()
 
         Label(text = s.isoPath)
@@ -76,7 +80,7 @@ adorn_flow(AppView, AppState)
 
 when isMainModule:
   owlkettle.brew(gui(AppView(state = AppState(
-    currentLang: translations.en,
+    currentLang: en,
     isoPath: "No ISO Selected",
-    logContent: translations.LangData[translations.en]["status_ready"]
+    logContent: translations.LangData[translations.en]["status_ready"] [cite: 1]
   ))))
