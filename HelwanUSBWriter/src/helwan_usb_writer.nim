@@ -1,19 +1,16 @@
 import owlkettle, osproc, os, strutils, translations, tables
 
-# تعريف النوع يدوياً قبل الماكرو عشان المترجم ميهنجش
-type
-  AppState* = ref object
-    currentLangStr*: string
-    isoPath*: string
-    logContent*: string
-    selectedDevice*: string
-
-# الماكرو الآن مهمته الربط فقط وليس إنشاء الحقول من الصفر
-viewable AppState
+# الماكرو محتاج الحقول جواه عشان يبني الـ Type صح في الـ Runner
+viewable AppState:
+  currentLangStr: string
+  isoPath: string
+  logContent: string
+  selectedDevice: string
 
 proc t(state: AppState, key: string): string =
-  let lang = if state.currentLangStr == "ar": ar else: en
-  result = LangData[lang][key]
+  # استخدام translations.en و translations.ar عشان نضمن الوصول للـ Enum
+  let lang = if state.currentLangStr == "ar": translations.ar else: translations.en
+  result = translations.LangData[lang][key]
 
 method view(view: AppView): Widget =
   let s = view.state
@@ -78,11 +75,11 @@ method view(view: AppView): Widget =
 adorn_flow(AppView, AppState)
 
 when isMainModule:
-  # تهيئة الحالة يدوياً
+  # هنا بنحط القيم الافتراضية عشان الماكرو فوق يكون بسيط
   let initial = AppState(
     currentLangStr: "en",
     isoPath: "No ISO Selected",
-    logContent: LangData[en]["status_ready"],
+    logContent: translations.LangData[translations.en]["status_ready"],
     selectedDevice: ""
   )
   owlkettle.brew(gui(AppView(state = initial)))
