@@ -16,17 +16,15 @@ jobs:
 
       - name: Build Program
         run: |
-          # التأكد من تحميل المكتبات
+          # 1. تثبيت المكتبة
           nimble install --accept owlkettle
           
-          # تأكد من المسار: إذا كان الكود داخل مجلد فرعي، استخدم cd
-          # سنستخدم البحث التلقائي عن المجلد لو وجد
-          [ -d "src" ] || cd $(find . -maxdepth 2 -type d -name "src" -exec dirname {} \;)
+          # 2. الدخول للمجلد الذي يحتوي على src (حل مشكلة No such file)
+          # سنبحث عن مكان المجلد src وندخل إليه
+          cd $(find . -type d -name "src" -exec dirname {} \;)
           
-          # التجميع الآن من داخل المجلد الذي يحتوي على src
-          nim c -d:release --out:hel-usb-writer src/helwan_usb_writer.nim
+          # 3. التجميع الآن من المسار الصحيح
+          nim c -d:release --out:../hel-usb-writer src/helwan_usb_writer.nim
 
       - name: Check Executable
-        run: |
-          # التأكد من وجود الملف الناتج
-          find . -name "hel-usb-writer" -type f
+        run: ls -l hel-usb-writer || find . -name "hel-usb-writer"
