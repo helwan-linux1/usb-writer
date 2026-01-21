@@ -1,0 +1,23 @@
+name: Build Checker
+on: [push, pull_request]
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Install System Dependencies
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm git nim nimble gtk4 libadwaita base-devel
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Program
+        run: |
+          nimble install --accept owlkettle
+          nim c -d:release --out:hel-usb-writer src/helwan_usb_writer.nim
+
+      - name: Check Executable
+        run: ls -l hel-usb-writer
