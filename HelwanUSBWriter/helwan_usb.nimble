@@ -1,11 +1,11 @@
 # Package
-version       = "1.0.0"
+version       = "0.1.0"
 author        = "Helwan Linux Team"
-description   = "Professional ISO to USB writer for Helwan Linux"
+description   = "USB Writer for Helwan Linux"
 license       = "GPL-3.0"
 srcDir        = "src"
-bin           = @["helwan_usb_writer"] # اسم الملف التنفيذي الناتج
+bin           = @["helwan_usb_writer"]
 
 # Dependencies
-requires "nim >= 1.6.0"
-requires "owlkettle >= 2.0.0" # المكتبة التي تستخدمها في الواجهة
+requires "nim >= 2.0.0"
+requires "gintro >= 0.10.0" # بدلاً من owlkettle
