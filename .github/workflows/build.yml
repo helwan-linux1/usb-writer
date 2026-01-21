@@ -16,13 +16,13 @@ jobs:
 
       - name: Build Program
         run: |
+          # 1. تثبيت المكتبة
           nimble install --accept owlkettle
-          # البحث عن ملف الـ nim وتغيير المسار إليه آلياً
-          FILE_PATH=$(find . -name "helwan_usb_writer.nim")
-          DIR_PATH=$(dirname $(dirname "$FILE_PATH"))
-          cd "$DIR_PATH"
-          # التجميع من داخل المجلد الصحيح
-          nim c -d:release --out:hel-usb-writer src/helwan_usb_writer.nim
+          
+          # 2. تحديد مكان الملف وتجميعه في مكانه الأصلي
+          # هذا الأمر سيجد الملف أينما كان ويقوم بتجميعه داخل المجلد الخاص به
+          TARGET_FILE=$(find . -name "helwan_usb_writer.nim")
+          nim c -d:release "$TARGET_FILE"
 
-      - name: Verify
-        run: find . -name "hel-usb-writer" -type f
+      - name: Check Result
+        run: find . -name "helwan_usb_writer" -type f
