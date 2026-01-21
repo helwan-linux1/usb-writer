@@ -1,14 +1,17 @@
 import owlkettle, osproc, os, strutils, translations, tables
 
-# الماكرو محتاج الحقول جواه عشان يبني الـ Type صح في الـ Runner
-viewable AppState:
-  currentLangStr: string
-  isoPath: string
-  logContent: string
-  selectedDevice: string
+# تعريف الـ State كـ Object عادي جداً بعيداً عن سحر الماكروز
+type
+  AppState = ref object
+    currentLangStr: string
+    isoPath: string
+    logContent: string
+    selectedDevice: string
+
+# يدويًا نربط الـ AppState بالـ AppView كما تتوقع المكتبة
+viewable AppState
 
 proc t(state: AppState, key: string): string =
-  # استخدام translations.en و translations.ar عشان نضمن الوصول للـ Enum
   let lang = if state.currentLangStr == "ar": translations.ar else: translations.en
   result = translations.LangData[lang][key]
 
@@ -75,7 +78,6 @@ method view(view: AppView): Widget =
 adorn_flow(AppView, AppState)
 
 when isMainModule:
-  # هنا بنحط القيم الافتراضية عشان الماكرو فوق يكون بسيط
   let initial = AppState(
     currentLangStr: "en",
     isoPath: "No ISO Selected",
