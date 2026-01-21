@@ -1,14 +1,15 @@
 import owlkettle, osproc, os, strutils, translations, tables
 
+# تعريف الحالة كـ Viewable بدون قيم افتراضية داخل الماكرو
+# هذا يضمن أن الماكرو سينشئ الحقول (Fields) بشكل صحيح
 viewable AppState:
-  # نستخدم string هنا بدلاً من Language Enum لضمان قراءته بواسطة الماكرو
-  currentLangStr: string = "en" 
-  isoPath: string = "No ISO Selected"
-  logContent: string = ""
-  selectedDevice: string = ""
+  currentLangStr: string
+  isoPath: string
+  logContent: string
+  selectedDevice: string
 
+# دالة الترجمة
 proc t(state: AppState, key: string): string =
-  # تحويل الـ string إلى النوع Language المطلوب لجدول الترجمة
   let lang = if state.currentLangStr == "ar": ar else: en
   result = LangData[lang][key]
 
@@ -75,8 +76,11 @@ method view(view: AppView): Widget =
 adorn_flow(AppView, AppState)
 
 when isMainModule:
-  owlkettle.brew(gui(AppView(state = AppState(
+  # نقوم بتهيئة القيم هنا يدوياً لضمان حقنها في الـ State
+  let initial = AppState(
     currentLangStr: "en",
     isoPath: "No ISO Selected",
-    logContent: LangData[en]["status_ready"]
-  ))))
+    logContent: LangData[en]["status_ready"],
+    selectedDevice: ""
+  )
+  owlkettle.brew(gui(AppView(state = initial)))
